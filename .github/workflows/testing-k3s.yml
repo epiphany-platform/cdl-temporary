@@ -41,6 +41,7 @@ jobs:
       - name: check if pods are running
         run: "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
       - name: uninstall cdl kafka
+        run: helm uninstall cdl
       # - name: wait
       #   run: sleep 30
       # - name: deply cdl rabbitmq
