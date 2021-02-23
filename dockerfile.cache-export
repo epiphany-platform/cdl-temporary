@@ -1,0 +1,4 @@
+# syntax=docker/dockerfile:experimental
+FROM alpine as cache-export
+RUN  --mount=type=cache,id=cdl-target,mode=0755,target=/usr/src/cdl/target \
+    tar cvfz cache_target.tar -C /usr/src/cdl/target/*
