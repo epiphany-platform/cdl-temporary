@@ -34,11 +34,20 @@ jobs:
           do
           kubectl exec infrastructure-kafka-0 /bin/bash -- /opt/bitnami/kafka/bin/kafka-topics.sh --create --topic $topic --bootstrap-server localhost:9092
           done
-      - name: deploy cdl
+      - name: deploy cdl kafka
         run: helm install --values ./deployment/helm/cdl/values-local.yaml cdl ./deployment/helm/cdl
       - name: wait
         run: sleep 20
-      - name: get status
-        run: kubectl get pods
-      - name: check if running test
-        run: "[[ -z `kubectl get pods --field-selector=status.phase=Running` ]]"
+      - name: check if pods are running
+        run: "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
+      - name: uninstall cdl kafka
+      # - name: wait
+      #   run: sleep 30
+      # - name: deply cdl rabbitmq
+      #   run: helm uninstall cdl
+      # - name: wait
+      #   run: sleep 20
+      # - name: check if pods are running
+      #   run: "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
+      # - name: uninstall cdl rabbitmq
+      #   run: helm uninstall cdl
