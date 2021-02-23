@@ -25,6 +25,8 @@ jobs:
 
       - name: deploy infrastructure
         run: helm install --values ./deployment/helm/infrastructure/values.yaml infrastructure ./deployment/helm/infrastructure
+      - name: Change cargo profile settings
+        run: cp Cargo.toml.ci Cargo.toml
       - name: build cdl images
         run: DOCKER_BUILDKIT=1 ENV=DEV ./build.sh
       - name: add kafka topics
