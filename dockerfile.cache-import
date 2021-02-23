@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
 FROM local/cache
-RUN --mount=type=cache,id=cdl-target,mode=0755,target=/usr/src/cdl/target \
+RUN --mount=type=cache,mode=0755,target=/usr/src/cdl/target \
     tar xvf cache_target.tar -C /usr/src/cdl/target
 
