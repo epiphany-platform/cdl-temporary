@@ -69,4 +69,3 @@ RUN if [ "$ENV" != "DEV" ]; \
 FROM alpine
 
 COPY --from=cargo-build /usr/src/cdl/output/* /bin/
-COPY benchmarking/sample_json sample_json/
