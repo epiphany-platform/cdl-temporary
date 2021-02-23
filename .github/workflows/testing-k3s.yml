@@ -41,4 +41,4 @@ jobs:
       - name: get status
         run: kubectl get pods
       - name: check if running test
-        run: [[ -z `kubectl get pods --field-selector=status.phase=Running` ]]
+        run: "[[ -z `kubectl get pods --field-selector=status.phase=Running` ]]"
