@@ -30,10 +30,12 @@ jobs:
 
       - name: Cache cargo directories
         uses: actions/cache@v2.1.4
+        id: cache
         with:
           path: |
             ./cache_img
-          key: ${{ runner.os }}-docker
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-docker-
       - name: Import cache image
         continue-on-error: true
         run: |
@@ -45,6 +47,7 @@ jobs:
       - name: build cdl images
         run: DOCKER_BUILDKIT=1 ENV=DEV ./build.sh
       - name: Build cache
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           DOCKER_BUILDKIT=1 docker build -t local/cache --file=dockerfile.cache-export --no-cache  .
           docker save local/cache:latest > cache_img
