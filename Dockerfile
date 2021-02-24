@@ -11,48 +11,20 @@ RUN apt-get update && apt-get install -y cmake
 
 WORKDIR /usr/src/cdl/
 COPY rust-toolchain ./
-COPY Cargo.lock ./
-COPY Cargo.toml ./
-
-COPY benchmarking/Cargo.toml benchmarking/Cargo.toml
-COPY crates/cdl-cli/Cargo.toml crates/cdl-cli/Cargo.toml
-COPY crates/command-service/Cargo.toml crates/command-service/Cargo.toml
-COPY crates/data-router/Cargo.toml crates/data-router/Cargo.toml
-COPY crates/db-shrinker-postgres/Cargo.toml crates/db-shrinker-postgres/Cargo.toml
-COPY crates/leader-elector/Cargo.toml crates/leader-elector/Cargo.toml
-COPY crates/query-router/Cargo.toml crates/query-router/Cargo.toml
-COPY crates/query-service/Cargo.toml crates/query-service/Cargo.toml
-COPY crates/query-service-ts/Cargo.toml crates/query-service-ts/Cargo.toml
-COPY crates/rpc/Cargo.toml crates/rpc/Cargo.toml
-COPY crates/schema-registry/Cargo.toml crates/schema-registry/Cargo.toml
-COPY crates/utils/Cargo.toml crates/utils/Cargo.toml
-COPY crates/api/Cargo.toml crates/api/Cargo.toml
-
-RUN --mount=type=cache,mode=0755,target=/root/.cargo/registry \
-    cargo fetch
 RUN rustup target add x86_64-unknown-linux-musl
+COPY Cargo.lock Cargo.toml ./
 
 COPY benchmarking/ benchmarking/
-COPY crates/cdl-cli/ crates/cdl-cli/
-COPY crates/command-service/ crates/command-service/
-COPY crates/data-router/ crates/data-router/
-COPY crates/db-shrinker-postgres/ crates/db-shrinker-postgres/
-COPY crates/leader-elector/ crates/leader-elector/
-COPY crates/query-router/ crates/query-router/
-COPY crates/query-service/ crates/query-service/
-COPY crates/query-service-ts/ crates/query-service-ts/
-COPY crates/rpc/ crates/rpc/
-COPY crates/schema-registry/ crates/schema-registry/
-COPY crates/utils/ crates/utils/
-COPY crates/api/ crates/api/
+COPY crates/  crates/
 
 ARG ENV
 
 RUN --mount=type=cache,mode=0755,target=/root/.cargo/registry \
+    --mount=type=cache,mode=0755,target=/root/.cargo/git \
     --mount=type=cache,mode=0755,target=/usr/src/cdl/target \
     if [ "$ENV" = "DEV" ]; \
-    then CARGO_ARGS="--out-dir=output -Z unstable-options --offline"; \
-    else CARGO_ARGS="--out-dir=output -Z unstable-options --offline --release"; \
+    then CARGO_ARGS="--out-dir=output -Z unstable-options"; \
+    else CARGO_ARGS="--out-dir=output -Z unstable-options --release"; \
     fi && \
     LIB_LDFLAGS=-L/usr/lib/x86_64-linux-gnu CFLAGS=-I/usr/local/musl/include CC=musl-gcc CXX=g++ \
     cargo build $CARGO_ARGS --workspace $FEATURE_FLAGS
