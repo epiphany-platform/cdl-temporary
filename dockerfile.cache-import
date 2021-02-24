@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:experimental
 FROM local/cache
 RUN --mount=type=cache,mode=0755,target=/usr/src/cdl/target \
-    tar xvf cache_target.tar -C /usr/src/cdl/target
+    --mount=type=cache,mode=0755,target=/root/.cargo/registry \
+    tar xvf cache_target.tar -C /usr/src/cdl/target && \
+    tar xvf cache_registry.tar -C /root/.cargo/registry
 

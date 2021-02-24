@@ -28,7 +28,8 @@ COPY crates/schema-registry/Cargo.toml crates/schema-registry/Cargo.toml
 COPY crates/utils/Cargo.toml crates/utils/Cargo.toml
 COPY crates/api/Cargo.toml crates/api/Cargo.toml
 
-RUN cargo fetch
+RUN --mount=type=cache,mode=0755,target=/root/.cargo/registry \
+    cargo fetch
 RUN rustup target add x86_64-unknown-linux-musl
 
 COPY benchmarking/ benchmarking/
@@ -46,18 +47,15 @@ COPY crates/utils/ crates/utils/
 COPY crates/api/ crates/api/
 
 ARG ENV
-ARG BIN
 
-RUN --mount=type=cache,mode=0755,target=/usr/local/cargo/registry \
+RUN --mount=type=cache,mode=0755,target=/root/.cargo/registry \
     --mount=type=cache,mode=0755,target=/usr/src/cdl/target \
     if [ "$ENV" = "DEV" ]; \
-    then CARGO_ARGS="--offline"; CARGO_PROFILE="debug"; \
-    else CARGO_ARGS="--offline --release"; CARGO_PROFILE="release"; \
+    then CARGO_ARGS="--out-dir=output -Z unstable-options --offline"; \
+    else CARGO_ARGS="--out-dir=output -Z unstable-options --offline --release"; \
     fi && \
     LIB_LDFLAGS=-L/usr/lib/x86_64-linux-gnu CFLAGS=-I/usr/local/musl/include CC=musl-gcc CXX=g++ \
-    cargo build $CARGO_ARGS --workspace $FEATURE_FLAGS && \
-    mkdir output && \
-    bash -c "cp target/x86_64-unknown-linux-musl/$CARGO_PROFILE/$BIN output/"
+    cargo build $CARGO_ARGS --workspace $FEATURE_FLAGS
 
 RUN if [ "$ENV" != "DEV" ]; \
     then for f in output/*; do strip $f; done; fi
@@ -68,4 +66,5 @@ RUN if [ "$ENV" != "DEV" ]; \
 
 FROM alpine
 
-COPY --from=cargo-build /usr/src/cdl/output/* /bin/
+ARG BIN
+COPY --from=cargo-build /usr/src/cdl/output/$BIN /bin/

@@ -28,30 +28,20 @@ jobs:
       - name: Change cargo profile settings
         run: cp Cargo.toml.ci Cargo.toml
 
-      - name: Cache cargo directories
-        uses: actions/cache@v2.1.4
-        with:
-          path: |
-            ./cache_img
-            ./builder_img
-          key: ${{ runner.os }}-docker
-      - name: Import builder image
-        continue-on-error: true
-        run: |
-          docker load -i builder_img
-          docker tag $(docker images | awk '{print $3}'  | awk 'NR==2') local/builder
-      - name: Import cache image
-        continue-on-error: true
-        run: |
-          docker load -i cache_img
-          docker tag $(docker images | awk '{print $3}'  | awk 'NR==2') local/cache
-      - name: Restore cache
-        continue-on-error: true
-        run: DOCKER_BUILDKIT=1 docker build --file=dockerfile.cache-import --no-cache  .
-      - name: Build builder image
-        run: |
-          DOCKER_BUILDKIT=1 docker build -t local/builder --build-arg BIN=data-router --build-arg ENV=DEV --target cargo-build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from local/builder .
-          docker save local/builder:latest > builder_img
+      # - name: Cache cargo directories
+      #   uses: actions/cache@v2.1.4
+      #   with:
+      #     path: |
+      #       ./cache_img
+      #     key: ${{ runner.os }}-docker
+      # - name: Import cache image
+      #   continue-on-error: true
+      #   run: |
+      #     docker load -i cache_img
+      #     docker tag $(docker images | awk '{print $3}'  | awk 'NR==2') local/cache
+      # - name: Restore cache
+      #   continue-on-error: true
+      #   run: DOCKER_BUILDKIT=1 docker build --file=dockerfile.cache-import --no-cache  .
       - name: build cdl images
         run: DOCKER_BUILDKIT=1 ENV=DEV ./build.sh
       - name: Build cache
