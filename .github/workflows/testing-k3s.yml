@@ -70,9 +70,11 @@ jobs:
       - name: deploy cdl kafka
         run: helm install --values ./deployment/helm/cdl/values-local.yaml cdl ./deployment/helm/cdl
       - name: wait
-        run: sleep 20
+        run: sleep 30
       - name: check if pods are running
-        run: "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
+        run: |
+          kubectl get pods
+          "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
       - name: uninstall cdl kafka
         run: helm uninstall cdl
       - name: wait
@@ -81,8 +83,10 @@ jobs:
       - name: depoly cdl rabbitmq
         run: helm install --values ./deployment/helm/cdl/values-local.yaml --set global.communicationMethod=amqp cdl ./deployment/helm/cdl
       - name: wait
-        run: sleep 20
+        run: sleep 30
       - name: check if pods are running
-        run: "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
+        run: |
+          kubectl get pods
+          "[[ -z `kubectl get pods --field-selector=status.phase!=Running` ]]"
       - name: uninstall cdl rabbitmq
         run: helm uninstall cdl
