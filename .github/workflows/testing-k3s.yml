@@ -28,14 +28,18 @@ jobs:
       - name: Change cargo profile settings
         run: cp Cargo.toml.ci Cargo.toml
 
+      - name: Get Date
+        id: get-date
+        run: |
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m")"
       - name: Cache cargo directories
         uses: actions/cache@v2.1.4
         id: cache
         with:
           path: |
             ./cache_img
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-docker-
+          key: ${{ runner.os }}-docker-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-docker-${{ steps.get-date.outputs.date }}-
       - name: Import cache image
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
