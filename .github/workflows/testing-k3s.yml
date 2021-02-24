@@ -28,12 +28,12 @@ jobs:
       - name: Change cargo profile settings
         run: cp Cargo.toml.ci Cargo.toml
 
-      # - name: Cache cargo directories
-      #   uses: actions/cache@v2.1.4
-      #   with:
-      #     path: |
-      #       ./cache_img
-      #     key: ${{ runner.os }}-docker
+      - name: Cache cargo directories
+        uses: actions/cache@v2.1.4
+        with:
+          path: |
+            ./cache_img
+          key: ${{ runner.os }}-docker
       # - name: Import cache image
       #   continue-on-error: true
       #   run: |
