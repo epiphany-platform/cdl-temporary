@@ -34,14 +34,14 @@ jobs:
           path: |
             ./cache_img
           key: ${{ runner.os }}-docker
-      # - name: Import cache image
-      #   continue-on-error: true
-      #   run: |
-      #     docker load -i cache_img
-      #     docker tag $(docker images | awk '{print $3}'  | awk 'NR==2') local/cache
-      # - name: Restore cache
-      #   continue-on-error: true
-      #   run: DOCKER_BUILDKIT=1 docker build --file=dockerfile.cache-import --no-cache  .
+      - name: Import cache image
+        continue-on-error: true
+        run: |
+          docker load -i cache_img
+          docker tag $(docker images | awk '{print $3}'  | awk 'NR==2') local/cache
+      - name: Restore cache
+        continue-on-error: true
+        run: DOCKER_BUILDKIT=1 docker build --file=dockerfile.cache-import --no-cache  .
       - name: build cdl images
         run: DOCKER_BUILDKIT=1 ENV=DEV ./build.sh
       - name: Build cache
